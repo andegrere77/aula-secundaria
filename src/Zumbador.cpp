@@ -7,7 +7,7 @@ void Zumbador::iniciar()
     digitalWrite(Config::PIN_ZUMBADOR, LOW);
 }
 
-void Zumbador::actualizar(float ruidoDBA)
+void Zumbador::actualizar(float ruidoDBA, float umbralRuidoDBA)
 {
     uint32_t ahora = millis();
 
@@ -16,7 +16,7 @@ void Zumbador::actualizar(float ruidoDBA)
         return;
     }
 
-    if (ruidoDBA >= Config::UMBRAL_RUIDO_DBA)
+    if (ruidoDBA >= umbralRuidoDBA)
     {
         if (!contandoRuido)
         {

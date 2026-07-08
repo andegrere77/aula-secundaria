@@ -153,7 +153,7 @@ void Sistema::actualizarRuido()
 
     datos.ruido = sensorRuido.ruidoDBA();
     semaforo.actualizar(datos.ruido, datos.ruidoBase, datos.umbralRuido);
-    zumbador.actualizar(datos.ruido);
+    zumbador.actualizar(datos.ruido, datos.umbralRuido);
 
     Serial.print("Ruido      : ");
     Serial.print(datos.ruido, 1);

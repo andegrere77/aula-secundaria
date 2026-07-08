@@ -3,6 +3,6 @@
 namespace Version
 {
     constexpr const char* NOMBRE_PROYECTO = "aula-secundaria";
-    constexpr const char* VERSION = "0.11.0";
-    constexpr const char* DESCRIPCION = "Calibracion automatica del ruido";
+    constexpr const char* VERSION = "0.12.0";
+    constexpr const char* DESCRIPCION = "Zumbador usa umbral calibrado";
 }

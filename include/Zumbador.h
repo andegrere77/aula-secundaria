@@ -6,7 +6,7 @@ class Zumbador
 {
 public:
     void iniciar();
-    void actualizar(float ruidoDBA);
+    void actualizar(float ruidoDBA, float umbralRuidoDBA);
 
 private:
     bool contandoRuido = false;
