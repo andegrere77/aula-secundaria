@@ -1,0 +1,18 @@
+# aula-secundaria
+
+Sistema IoT para la monitorización ambiental de aulas mediante ESP32.
+
+## Hardware
+
+- ESP32
+- BME280
+- DFRobot SEN0232
+- OLED SSD1306
+- WS2812
+- Zumbador activo
+
+## Estado del proyecto
+
+Versión: 0.1.0
+
+En desarrollo.
