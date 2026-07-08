@@ -13,19 +13,19 @@ void SemaforoLED::iniciar()
     tira.show();
 }
 
-void SemaforoLED::actualizar(float ruidoDBA)
+void SemaforoLED::actualizar(float ruidoDBA, float ruidoBaseDBA, float umbralRuidoDBA)
 {
     uint8_t ledsRojos = 0;
 
-    if (ruidoDBA >= Config::UMBRAL_RUIDO_DBA)
+    if (ruidoDBA >= umbralRuidoDBA)
     {
         ledsRojos = Config::NUM_LEDS;
     }
     else
     {
         float proporcion =
-            (ruidoDBA - Config::RUIDO_BASE_DBA) /
-            (Config::UMBRAL_RUIDO_DBA - Config::RUIDO_BASE_DBA);
+            (ruidoDBA - ruidoBaseDBA) /
+            (umbralRuidoDBA - ruidoBaseDBA);
 
         proporcion = constrain(proporcion, 0.0f, 1.0f);
 
@@ -33,6 +33,24 @@ void SemaforoLED::actualizar(float ruidoDBA)
     }
 
     mostrarVerdeRojo(ledsRojos);
+}
+
+void SemaforoLED::mostrarCalibracion()
+{
+    for (uint8_t i = 0; i < Config::NUM_LEDS; i++)
+    {
+        tira.setPixelColor(i, tira.Color(0, 0, 0));
+    }
+
+    tira.setPixelColor(posicionCalibracion, tira.Color(0, 0, 255));
+    tira.show();
+
+    posicionCalibracion++;
+
+    if (posicionCalibracion >= Config::NUM_LEDS)
+    {
+        posicionCalibracion = 0;
+    }
 }
 
 void SemaforoLED::mostrarVerdeRojo(uint8_t ledsRojos)

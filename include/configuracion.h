@@ -33,4 +33,7 @@ namespace Config
     constexpr uint32_t TIEMPO_RUIDO_ALTO = 5000;
     constexpr uint32_t TIEMPO_ZUMBADOR = 5000;
     constexpr uint32_t TIEMPO_REPOSO_ZUMBADOR = 30000;
+
+    constexpr uint32_t TIEMPO_CALIBRACION_RUIDO = 10000;
+    constexpr float MARGEN_RUIDO_DBA = 20.0f; 
 }

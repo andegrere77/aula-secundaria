@@ -39,4 +39,5 @@ private:
     void actualizarBME280();
     void actualizarRuido();
     void imprimirLecturas();
+    void calibrarRuido();
 };

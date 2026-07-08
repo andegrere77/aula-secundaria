@@ -53,6 +53,8 @@ void Sistema::iniciar()
     zumbador.iniciar();
     logger.info("Zumbador activo inicializado correctamente");
 
+    calibrarRuido();
+
 }
 
 void Sistema::actualizar()
@@ -150,11 +152,54 @@ void Sistema::actualizarRuido()
     sensorRuido.actualizar();
 
     datos.ruido = sensorRuido.ruidoDBA();
-    semaforo.actualizar(datos.ruido);
+    semaforo.actualizar(datos.ruido, datos.ruidoBase, datos.umbralRuido);
     zumbador.actualizar(datos.ruido);
 
     Serial.print("Ruido      : ");
     Serial.print(datos.ruido, 1);
+    Serial.println(" dBA");
+}
+
+void Sistema::calibrarRuido()
+{
+    logger.info("Calibrando ruido ambiente durante 10 segundos");
+
+    uint32_t inicio = millis();
+
+    float sumaRuido = 0.0f;
+    uint16_t contador = 0;
+
+    while (millis() - inicio < Config::TIEMPO_CALIBRACION_RUIDO)
+    {
+        sensorRuido.actualizar();
+
+        sumaRuido += sensorRuido.ruidoDBA();
+        contador++;
+
+        semaforo.mostrarCalibracion();
+
+        delay(100);
+    }
+
+    if (contador > 0)
+    {
+        datos.ruidoBase = sumaRuido / contador;
+    }
+    else
+    {
+        datos.ruidoBase = Config::RUIDO_BASE_DBA;
+    }
+
+    datos.umbralRuido = datos.ruidoBase + Config::MARGEN_RUIDO_DBA;
+
+    logger.info("Calibracion de ruido finalizada");
+
+    Serial.print("Ruido base : ");
+    Serial.print(datos.ruidoBase, 1);
+    Serial.println(" dBA");
+
+    Serial.print("Umbral ruido : ");
+    Serial.print(datos.umbralRuido, 1);
     Serial.println(" dBA");
 }
 

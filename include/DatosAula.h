@@ -16,6 +16,7 @@ struct DatosSensores
 
     float ruido = 0.0f;
     float ruidoBase = 0.0f;
+    float umbralRuido = 0.0f;
     float ruidoMaximo = 0.0f;
 
     EstadoAula estado = EstadoAula::SILENCIO;
