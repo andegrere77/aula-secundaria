@@ -11,4 +11,10 @@ namespace Config
     constexpr uint32_t INTERVALO_PARPADEO = 1000;
 
     constexpr uint8_t DIRECCION_BME280 = 0x76;
+
+    constexpr uint8_t OLED_ANCHO = 128;
+    constexpr uint8_t OLED_ALTO = 64;
+    constexpr int8_t OLED_RESET = -1;
+    constexpr uint8_t OLED_DIRECCION = 0x3C;
+    constexpr uint32_t INTERVALO_OLED = 2000;
 }

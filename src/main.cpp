@@ -4,10 +4,13 @@
 #include "versiones.h"
 #include "logger.h"
 #include "SensorBME280.h"
+#include "PantallaOLED.h"
 
 Logger logger;
 
 SensorBME280 sensorBME280;
+
+PantallaOLED pantalla;
 
 unsigned long ultimoParpadeo = 0;
 bool estadoLed = false;
@@ -53,6 +56,15 @@ void setup()
         logger.error("No se encuentra el BME280");
     }
     
+    if (pantalla.iniciar())
+    {
+        logger.info("Pantalla OLED inicializada correctamente");
+        pantalla.mostrarInicio();
+    }
+    else
+    {
+        logger.error("No se encuentra la pantalla OLED");
+    }
 }
 
 void loop()
@@ -90,5 +102,12 @@ if (millis() - ultimo >= 1000)
     Serial.print("Presion     : ");
     Serial.print(sensorBME280.presion());
     Serial.println(" hPa");
+
+
+    pantalla.mostrarLecturas(
+    sensorBME280.temperatura(),
+    sensorBME280.humedad(),
+    sensorBME280.presion()
+);
 }
 }
