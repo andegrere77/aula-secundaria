@@ -24,6 +24,17 @@ void Sistema::iniciar()
         logger.error("No se encuentra el BME280");
     }
 
+    ruidoOK = sensorRuido.iniciar();
+
+    if (ruidoOK)
+    {
+        logger.info("Sensor de ruido SEN0232 inicializado correctamente");
+    }
+    else
+    {
+        logger.error("No se pudo inicializar el sensor de ruido");
+    }
+
     oledOK = pantalla.iniciar();
 
     if (oledOK)
@@ -40,7 +51,8 @@ void Sistema::iniciar()
 void Sistema::actualizar()
 {
     actualizarLed();
-    actualizarSensores();
+    actualizarBME280();
+    actualizarRuido();
 }
 
 void Sistema::mostrarBanner()
@@ -80,16 +92,16 @@ void Sistema::actualizarLed()
     }
 }
 
-void Sistema::actualizarSensores()
+void Sistema::actualizarBME280()
 {
     uint32_t ahora = millis();
 
-    if (ahora - ultimaLectura < Config::INTERVALO_OLED)
+    if (ahora - ultimaLecturaBME280 < Config::INTERVALO_OLED)
     {
         return;
     }
 
-    ultimaLectura = ahora;
+    ultimaLecturaBME280 = ahora;
 
     if (!bme280OK)
     {
@@ -109,6 +121,32 @@ void Sistema::actualizarSensores()
     {
         pantalla.mostrarLecturas(datos);
     }
+}
+
+void Sistema::actualizarRuido()
+{
+    uint32_t ahora = millis();
+
+    if (ahora - ultimaLecturaRuido < Config::INTERVALO_RUIDO)
+    {
+        return;
+    }
+
+    ultimaLecturaRuido = ahora;
+
+    if (!ruidoOK)
+    {
+        logger.error("No se puede actualizar ruido: SEN0232 no disponible");
+        return;
+    }
+
+    sensorRuido.actualizar();
+
+    datos.ruido = sensorRuido.ruidoDBA();
+
+    Serial.print("Ruido      : ");
+    Serial.print(datos.ruido, 1);
+    Serial.println(" dBA");
 }
 
 void Sistema::imprimirLecturas()
