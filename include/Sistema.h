@@ -7,6 +7,7 @@
 #include "SensorRuido.h"
 #include "PantallaOLED.h"
 #include "SemaforoLED.h"
+#include "Zumbador.h"
 #include "DatosAula.h"
 
 class Sistema
@@ -21,6 +22,7 @@ private:
     SensorRuido sensorRuido;
     PantallaOLED pantalla;
     SemaforoLED semaforo;
+    Zumbador zumbador;
     DatosSensores datos;
 
     uint32_t ultimoParpadeo = 0;

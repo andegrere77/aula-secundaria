@@ -50,6 +50,9 @@ void Sistema::iniciar()
     semaforo.iniciar();
     logger.info("Semaforo WS2812 inicializado correctamente");
 
+    zumbador.iniciar();
+    logger.info("Zumbador activo inicializado correctamente");
+
 }
 
 void Sistema::actualizar()
@@ -148,6 +151,7 @@ void Sistema::actualizarRuido()
 
     datos.ruido = sensorRuido.ruidoDBA();
     semaforo.actualizar(datos.ruido);
+    zumbador.actualizar(datos.ruido);
 
     Serial.print("Ruido      : ");
     Serial.print(datos.ruido, 1);
