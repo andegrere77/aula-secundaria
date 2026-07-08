@@ -6,6 +6,7 @@
 #include "SensorBME280.h"
 #include "SensorRuido.h"
 #include "PantallaOLED.h"
+#include "SemaforoLED.h"
 #include "DatosAula.h"
 
 class Sistema
@@ -19,6 +20,7 @@ private:
     SensorBME280 sensorBME280;
     SensorRuido sensorRuido;
     PantallaOLED pantalla;
+    SemaforoLED semaforo;
     DatosSensores datos;
 
     uint32_t ultimoParpadeo = 0;

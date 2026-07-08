@@ -20,4 +20,11 @@ namespace Config
 
     constexpr uint8_t PIN_SONIDO = 34;
     constexpr uint32_t INTERVALO_RUIDO = 1000;
+
+    constexpr uint8_t PIN_LEDS = 12;
+    constexpr uint8_t NUM_LEDS = 8;
+    constexpr uint8_t BRILLO_LEDS = 40;
+
+    constexpr float RUIDO_BASE_DBA = 45.0f;
+    constexpr float UMBRAL_RUIDO_DBA = 70.0f;
 }

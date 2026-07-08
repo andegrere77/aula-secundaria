@@ -46,6 +46,10 @@ void Sistema::iniciar()
     {
         logger.error("No se encuentra la pantalla OLED");
     }
+   
+    semaforo.iniciar();
+    logger.info("Semaforo WS2812 inicializado correctamente");
+
 }
 
 void Sistema::actualizar()
@@ -143,6 +147,7 @@ void Sistema::actualizarRuido()
     sensorRuido.actualizar();
 
     datos.ruido = sensorRuido.ruidoDBA();
+    semaforo.actualizar(datos.ruido);
 
     Serial.print("Ruido      : ");
     Serial.print(datos.ruido, 1);
