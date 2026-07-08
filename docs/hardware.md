@@ -1,0 +1,7 @@
+- placa Wemos D1 R32;
+- BME280;
+- SEN0232;
+- OLED;
+- WS2812;
+- zumbador;
+- conexiones.

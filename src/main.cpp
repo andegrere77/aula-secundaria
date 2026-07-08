@@ -1,37 +1,58 @@
 #include <Arduino.h>
 
-constexpr char NOMBRE_PROYECTO[] = "aula-secundaria";
-constexpr char VERSION[] = "0.1.0";
+#include "configuracion.h"
+#include "versiones.h"
+#include "logger.h"
+
+Logger logger;
+
+unsigned long ultimoParpadeo = 0;
+bool estadoLed = false;
 
 void mostrarBanner()
 {
     Serial.println();
-    Serial.println(F("=============================================="));
-    Serial.println(F("              aula-secundaria"));
-    Serial.println(F("=============================================="));
+    Serial.println("==============================================");
+    Serial.println("              aula-secundaria");
+    Serial.println("==============================================");
 
-    Serial.print(F("Versión : "));
-    Serial.println(VERSION);
+    Serial.print("Version : ");
+    Serial.println(Version::VERSION);
 
-    Serial.print(F("Compilado: "));
+    Serial.print("Descripcion : ");
+    Serial.println(Version::DESCRIPCION);
+
+    Serial.print("Compilado : ");
     Serial.print(__DATE__);
-    Serial.print(F(" "));
+    Serial.print(" ");
     Serial.println(__TIME__);
 
-    Serial.println(F("=============================================="));
+    Serial.println("==============================================");
     Serial.println();
 }
 
 void setup()
 {
-    Serial.begin(115200);
+    logger.iniciar(Config::VELOCIDAD_SERIE);
 
-    delay(1000);
+    pinMode(Config::PIN_LED_INTEGRADO, OUTPUT);
 
     mostrarBanner();
+
+    logger.info("Sistema iniciado correctamente");
 }
 
 void loop()
 {
-    delay(1000);
+    unsigned long ahora = millis();
+
+    if (ahora - ultimoParpadeo >= Config::INTERVALO_PARPADEO)
+    {
+        ultimoParpadeo = ahora;
+
+        estadoLed = !estadoLed;
+        digitalWrite(Config::PIN_LED_INTEGRADO, estadoLed);
+
+        logger.debug("Latido del sistema");
+    }
 }
