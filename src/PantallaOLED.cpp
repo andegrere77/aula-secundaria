@@ -31,7 +31,7 @@ void PantallaOLED::mostrarInicio()
     display.display();
 }
 
-void PantallaOLED::mostrarLecturas(float temperatura, float humedad, float presion)
+void PantallaOLED::mostrarLecturas(const DatosSensores& datos)
 {
     display.clearDisplay();
 
@@ -42,17 +42,17 @@ void PantallaOLED::mostrarLecturas(float temperatura, float humedad, float presi
 
     display.setCursor(0, 20);
     display.print("Temp : ");
-    display.print(temperatura, 1);
+    display.print(datos.temperatura, 1);
     display.println(" C");
 
     display.setCursor(0, 34);
     display.print("Hum  : ");
-    display.print(humedad, 0);
+    display.print(datos.humedad, 0);
     display.println(" %");
 
     display.setCursor(0, 48);
     display.print("Pres : ");
-    display.print(presion, 0);
+    display.print(datos.presion, 0);
     display.println(" hPa");
 
     display.display();

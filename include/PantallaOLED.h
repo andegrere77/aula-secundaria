@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Adafruit_SSD1306.h>
+#include "DatosAula.h"
 
 class PantallaOLED
 {
@@ -9,7 +10,7 @@ public:
 
     bool iniciar();
     void mostrarInicio();
-    void mostrarLecturas(float temperatura, float humedad, float presion);
+    void mostrarLecturas(const DatosSensores& datos);
 
 private:
     Adafruit_SSD1306 display;

@@ -99,26 +99,31 @@ void Sistema::actualizarSensores()
 
     sensorBME280.actualizar();
 
-    Serial.println("--------------------------------");
+    datos.temperatura = sensorBME280.temperatura();
+    datos.humedad = sensorBME280.humedad();
+    datos.presion = sensorBME280.presion();
 
-    Serial.print("Temperatura : ");
-    Serial.print(sensorBME280.temperatura());
-    Serial.println(" C");
-
-    Serial.print("Humedad     : ");
-    Serial.print(sensorBME280.humedad());
-    Serial.println(" %");
-
-    Serial.print("Presion     : ");
-    Serial.print(sensorBME280.presion());
-    Serial.println(" hPa");
+    imprimirLecturas();
 
     if (oledOK)
     {
-        pantalla.mostrarLecturas(
-            sensorBME280.temperatura(),
-            sensorBME280.humedad(),
-            sensorBME280.presion()
-        );
+        pantalla.mostrarLecturas(datos);
     }
+}
+
+void Sistema::imprimirLecturas()
+{
+    Serial.println("--------------------------------");
+
+    Serial.print("Temperatura : ");
+    Serial.print(datos.temperatura);
+    Serial.println(" C");
+
+    Serial.print("Humedad     : ");
+    Serial.print(datos.humedad);
+    Serial.println(" %");
+
+    Serial.print("Presion     : ");
+    Serial.print(datos.presion);
+    Serial.println(" hPa");
 }
