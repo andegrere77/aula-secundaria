@@ -40,17 +40,22 @@ void PantallaOLED::mostrarLecturas(const DatosSensores& datos)
     display.println("aula-secundaria");
     display.println("----------------");
 
-    display.setCursor(0, 20);
+    display.setCursor(0, 18);
     display.print("Temp : ");
     display.print(datos.temperatura, 1);
     display.println(" C");
 
-    display.setCursor(0, 34);
+    display.setCursor(0, 30);
     display.print("Hum  : ");
     display.print(datos.humedad, 0);
     display.println(" %");
 
-    display.setCursor(0, 48);
+    display.setCursor(0, 42);
+    display.print("Ruido: ");
+    display.print(datos.ruido, 1);
+    display.println(" dBA");
+
+    display.setCursor(0, 54);
     display.print("Pres : ");
     display.print(datos.presion, 0);
     display.println(" hPa");

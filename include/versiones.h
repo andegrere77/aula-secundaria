@@ -3,6 +3,6 @@
 namespace Version
 {
     constexpr const char* NOMBRE_PROYECTO = "aula-secundaria";
-    constexpr const char* VERSION = "0.7.0";
-    constexpr const char* DESCRIPCION = "Integracion sensor de ruido SEN0232";
+    constexpr const char* VERSION = "0.8.0";
+    constexpr const char* DESCRIPCION = "OLED muestra temperatura, humedad, ruido y presion";
 }
