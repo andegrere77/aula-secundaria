@@ -3,8 +3,11 @@
 #include "configuracion.h"
 #include "versiones.h"
 #include "logger.h"
+#include "SensorBME280.h"
 
 Logger logger;
+
+SensorBME280 sensorBME280;
 
 unsigned long ultimoParpadeo = 0;
 bool estadoLed = false;
@@ -40,6 +43,16 @@ void setup()
     mostrarBanner();
 
     logger.info("Sistema iniciado correctamente");
+
+    if (sensorBME280.iniciar())
+    {
+        logger.info("BME280 inicializado correctamente");
+    }
+    else
+    {
+        logger.error("No se encuentra el BME280");
+    }
+    
 }
 
 void loop()
@@ -55,4 +68,27 @@ void loop()
 
         logger.debug("Latido del sistema");
     }
+
+    static uint32_t ultimo = 0;
+
+if (millis() - ultimo >= 1000)
+{
+    ultimo = millis();
+
+    sensorBME280.actualizar();
+
+    Serial.println("--------------------------------");
+
+    Serial.print("Temperatura : ");
+    Serial.print(sensorBME280.temperatura());
+    Serial.println(" °C");
+
+    Serial.print("Humedad     : ");
+    Serial.print(sensorBME280.humedad());
+    Serial.println(" %");
+
+    Serial.print("Presion     : ");
+    Serial.print(sensorBME280.presion());
+    Serial.println(" hPa");
+}
 }
