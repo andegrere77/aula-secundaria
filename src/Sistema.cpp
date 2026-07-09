@@ -11,6 +11,9 @@ void Sistema::iniciar()
 
     mostrarBanner();
 
+    wifi.iniciar();
+    logger.info("Gestor WiFi iniciado");
+
     logger.info("Sistema iniciado correctamente");
 
     bme280OK = sensorBME280.iniciar();
@@ -59,6 +62,7 @@ void Sistema::iniciar()
 
 void Sistema::actualizar()
 {
+    actualizarWiFi();
     actualizarLed();
     actualizarBME280();
     actualizarRuido();
@@ -97,7 +101,7 @@ void Sistema::actualizarLed()
         estadoLed = !estadoLed;
         digitalWrite(Config::PIN_LED_INTEGRADO, estadoLed);
 
-        logger.debug("Latido del sistema");
+        // logger.debug("Latido del sistema");
     }
 }
 
@@ -156,12 +160,7 @@ void Sistema::actualizarRuido()
     semaforo.actualizar(datos.ruido, datos.ruidoBase, datos.umbralRuido);
     zumbador.actualizar(datos.ruido, datos.umbralRuido);
 
-    Serial.print("Ruido      : ");
-    Serial.print(datos.ruido, 1);
-    Serial.println(" dBA");
-
-    Serial.print("Estado aula: ");
-    Serial.println(textoEstadoAula(datos.estado));
+  
 }
 
 void Sistema::calibrarRuido()
@@ -222,6 +221,25 @@ void Sistema::imprimirLecturas()
     Serial.print("Presion     : ");
     Serial.print(datos.presion);
     Serial.println(" hPa");
+
+    Serial.print("Ruido       : ");
+    Serial.print(datos.ruido, 1);
+    Serial.println(" dBA");
+
+    Serial.print("Estado aula : ");
+    Serial.println(textoEstadoAula(datos.estado));
+
+    Serial.print("WiFi        : ");
+
+    if (wifi.conectado())
+    {
+        Serial.print("CONECTADO | IP: ");
+        Serial.println(wifi.ip());
+    }
+    else
+    {
+        Serial.println("DESCONECTADO");
+    }
 }
 
 void Sistema::actualizarEstadoAula()
@@ -251,5 +269,29 @@ void Sistema::actualizarEstadoAula()
     else
     {
         datos.estado = EstadoAula::ALARMA;
+    }
+}
+
+void Sistema::actualizarWiFi()
+{
+    wifi.actualizar();
+
+    bool wifiActual = wifi.conectado();
+
+    if (wifiActual != wifiAnterior)
+    {
+        wifiAnterior = wifiActual;
+
+        if (wifiActual)
+        {
+            logger.info("WiFi conectado");
+
+            Serial.print("IP: ");
+            Serial.println(wifi.ip());
+        }
+        else
+        {
+            logger.error("WiFi desconectado");
+        }
     }
 }

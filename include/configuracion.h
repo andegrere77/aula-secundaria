@@ -36,4 +36,6 @@ namespace Config
 
     constexpr uint32_t TIEMPO_CALIBRACION_RUIDO = 10000;
     constexpr float MARGEN_RUIDO_DBA = 20.0f; 
+
+    constexpr uint32_t INTERVALO_WIFI = 10000;
 }

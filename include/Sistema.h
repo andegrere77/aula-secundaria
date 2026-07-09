@@ -8,6 +8,7 @@
 #include "PantallaOLED.h"
 #include "SemaforoLED.h"
 #include "Zumbador.h"
+#include "GestorWiFi.h"
 #include "DatosAula.h"
 
 class Sistema
@@ -23,23 +24,26 @@ private:
     PantallaOLED pantalla;
     SemaforoLED semaforo;
     Zumbador zumbador;
+    GestorWiFi wifi;
     DatosSensores datos;
 
     uint32_t ultimoParpadeo = 0;
     uint32_t ultimaLecturaBME280 = 0;
     uint32_t ultimaLecturaRuido = 0;
+    uint32_t ultimoEstadoWiFi = 0;
 
     bool estadoLed = false;
     bool bme280OK = false;
     bool ruidoOK = false;
     bool oledOK = false;
+    bool wifiAnterior = false;
 
     void mostrarBanner();
     void actualizarLed();
     void actualizarBME280();
     void actualizarRuido();
+    void actualizarWiFi();
     void imprimirLecturas();
     void calibrarRuido();
     void actualizarEstadoAula();
-    
 };
