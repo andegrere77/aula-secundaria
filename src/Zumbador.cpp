@@ -11,6 +11,17 @@ void Zumbador::actualizar(float ruidoDBA, float umbralRuidoDBA)
 {
     uint32_t ahora = millis();
 
+    if (sonando)
+    {
+        if (ahora - inicioSonido >= Config::TIEMPO_ZUMBADOR)
+        {
+            detenerSonido();
+            ultimoAviso = ahora;
+        }
+
+        return;
+    }
+
     if (ahora - ultimoAviso < Config::TIEMPO_REPOSO_ZUMBADOR)
     {
         return;
@@ -26,21 +37,26 @@ void Zumbador::actualizar(float ruidoDBA, float umbralRuidoDBA)
 
         if (ahora - inicioRuidoAlto >= Config::TIEMPO_RUIDO_ALTO)
         {
-            sonar();
-            ultimoAviso = millis();
+            iniciarSonido();
             contandoRuido = false;
         }
     }
     else
     {
         contandoRuido = false;
-        digitalWrite(Config::PIN_ZUMBADOR, LOW);
+        detenerSonido();
     }
 }
 
-void Zumbador::sonar()
+void Zumbador::iniciarSonido()
 {
+    sonando = true;
+    inicioSonido = millis();
     digitalWrite(Config::PIN_ZUMBADOR, HIGH);
-    delay(Config::TIEMPO_ZUMBADOR);
+}
+
+void Zumbador::detenerSonido()
+{
+    sonando = false;
     digitalWrite(Config::PIN_ZUMBADOR, LOW);
 }

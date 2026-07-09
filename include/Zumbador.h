@@ -10,9 +10,12 @@ public:
 
 private:
     bool contandoRuido = false;
+    bool sonando = false;
 
     uint32_t inicioRuidoAlto = 0;
+    uint32_t inicioSonido = 0;
     uint32_t ultimoAviso = 0;
 
-    void sonar();
+    void iniciarSonido();
+    void detenerSonido();
 };
