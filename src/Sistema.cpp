@@ -208,38 +208,14 @@ void Sistema::calibrarRuido()
 
 void Sistema::imprimirLecturas()
 {
-    Serial.println("--------------------------------");
-
-    Serial.print("Temperatura : ");
-    Serial.print(datos.temperatura);
-    Serial.println(" C");
-
-    Serial.print("Humedad     : ");
-    Serial.print(datos.humedad);
-    Serial.println(" %");
-
-    Serial.print("Presion     : ");
-    Serial.print(datos.presion);
-    Serial.println(" hPa");
-
-    Serial.print("Ruido       : ");
-    Serial.print(datos.ruido, 1);
-    Serial.println(" dBA");
-
-    Serial.print("Estado aula : ");
-    Serial.println(textoEstadoAula(datos.estado));
-
-    Serial.print("WiFi        : ");
-
-    if (wifi.conectado())
-    {
-        Serial.print("CONECTADO | IP: ");
-        Serial.println(wifi.ip());
-    }
-    else
-    {
-        Serial.println("DESCONECTADO");
-    }
+    diagnostico.mostrar(
+        datos,
+        wifi.conectado(),
+        wifi.ip(),
+        bme280OK,
+        ruidoOK,
+        oledOK
+    );
 }
 
 void Sistema::actualizarEstadoAula()

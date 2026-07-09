@@ -10,6 +10,7 @@
 #include "Zumbador.h"
 #include "GestorWiFi.h"
 #include "DatosAula.h"
+#include "Diagnostico.h"
 
 class Sistema
 {
@@ -46,4 +47,6 @@ private:
     void imprimirLecturas();
     void calibrarRuido();
     void actualizarEstadoAula();
+    
+    Diagnostico diagnostico;
 };
