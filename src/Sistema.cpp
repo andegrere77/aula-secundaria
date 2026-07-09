@@ -71,6 +71,8 @@ void Sistema::actualizar()
     actualizarWiFi();
     actualizarNTP();
     actualizarFirebase();
+    probarFirebase();
+    enviarFirebase();
     actualizarLed();
     actualizarBME280();
     actualizarRuido();
@@ -292,4 +294,62 @@ void Sistema::actualizarNTP()
 void Sistema::actualizarFirebase()
 {
     firebase.actualizar(wifi.conectado());
+}
+
+void Sistema::enviarFirebase()
+{
+    uint32_t ahora = millis();
+
+    if (ahora - ultimoEnvioFirebase < Config::INTERVALO_FIREBASE)
+    {
+        return;
+    }
+
+    ultimoEnvioFirebase = ahora;
+
+    if (!firebase.conectado() || !ntp.sincronizado())
+    {
+        logger.error("No se envian datos: Firebase o NTP no disponible");
+        return;
+    }
+
+    bool enviado = firebase.enviarActual(
+        datos,
+        ntp.horaActual(),
+        ntp.timestamp()
+    );
+
+    if (enviado)
+    {
+        logger.info("Datos actuales enviados a Firebase");
+    }
+    else
+    {
+        logger.error("Error enviando datos actuales a Firebase");
+    }
+}
+
+void Sistema::probarFirebase()
+{
+    if (pruebaFirebaseEnviada)
+    {
+        return;
+    }
+
+    if (!firebase.conectado())
+    {
+        return;
+    }
+
+    bool ok = firebase.enviarPrueba();
+
+    if (ok)
+    {
+        logger.info("Prueba Firebase enviada correctamente");
+        pruebaFirebaseEnviada = true;
+    }
+    else
+    {
+        logger.error(firebase.ultimoError());
+    }
 }

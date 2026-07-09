@@ -44,4 +44,8 @@ namespace Config
     constexpr int NTP_OFFSET_VERANO = 3600;
 
     constexpr uint32_t INTERVALO_NTP = 60000;
+
+    constexpr const char* ID_AULA = "AULA-001";
+    constexpr uint32_t INTERVALO_FIREBASE = 10000;
+
 }

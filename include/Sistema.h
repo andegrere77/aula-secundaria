@@ -41,11 +41,17 @@ private:
     uint32_t ultimaLecturaRuido = 0;
     uint32_t ultimoEstadoWiFi = 0;
 
+    uint32_t ultimoEnvioFirebase = 0;
+
     bool estadoLed = false;
     bool bme280OK = false;
     bool ruidoOK = false;
     bool oledOK = false;
     bool wifiAnterior = false;
+
+    bool pruebaFirebaseEnviada = false;
+    
+    void probarFirebase();
 
     void mostrarBanner();
     void actualizarLed();
@@ -59,6 +65,8 @@ private:
     void actualizarNTP();
 
     void actualizarFirebase();
+
+    void enviarFirebase();
 
     
 };
