@@ -17,6 +17,9 @@ void Sistema::iniciar()
     ntp.iniciar();
     logger.info("Gestor NTP iniciado");
 
+    firebase.iniciar();
+    logger.info("Gestor Firebase iniciado");
+
     logger.info("Sistema iniciado correctamente");
 
     bme280OK = sensorBME280.iniciar();
@@ -67,6 +70,7 @@ void Sistema::actualizar()
 {
     actualizarWiFi();
     actualizarNTP();
+    actualizarFirebase();
     actualizarLed();
     actualizarBME280();
     actualizarRuido();
@@ -218,6 +222,8 @@ void Sistema::imprimirLecturas()
         wifi.ip(),
         ntp.sincronizado(),
         ntp.horaActual(),
+        firebase.conectado(),
+        firebase.uid(),
         bme280OK,
         ruidoOK,
         oledOK
@@ -281,4 +287,9 @@ void Sistema::actualizarWiFi()
 void Sistema::actualizarNTP()
 {
     ntp.actualizar(wifi.conectado());
+}
+
+void Sistema::actualizarFirebase()
+{
+    firebase.actualizar(wifi.conectado());
 }

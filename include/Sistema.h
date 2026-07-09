@@ -12,6 +12,7 @@
 #include "DatosAula.h"
 #include "Diagnostico.h"
 #include "GestorNTP.h"
+#include "GestorFirebase.h"
 
 class Sistema
 {
@@ -32,6 +33,8 @@ private:
     Diagnostico diagnostico;
 
     GestorNTP ntp;
+
+    GestorFirebase firebase;
 
     uint32_t ultimoParpadeo = 0;
     uint32_t ultimaLecturaBME280 = 0;
@@ -54,6 +57,8 @@ private:
     void actualizarEstadoAula();
 
     void actualizarNTP();
+
+    void actualizarFirebase();
 
     
 };

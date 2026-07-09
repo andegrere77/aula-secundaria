@@ -6,6 +6,8 @@ void Diagnostico::mostrar(
     const char* ip,
     bool ntpSincronizado,
     const char* hora,
+    bool firebaseConectado,
+    const char* uidFirebase,
     bool bme280OK,
     bool ruidoOK,
     bool oledOK
@@ -57,6 +59,12 @@ void Diagnostico::mostrar(
         Serial.println("DESCONECTADO");
     }
 
+    Serial.print("Firebase   : ");
+    Serial.println(firebaseConectado ? "CONECTADO" : "DESCONECTADO");
+
+    Serial.print("UID        : ");
+    Serial.println(uidFirebase);
+    
     Serial.print("BME280      : ");
     Serial.println(bme280OK ? "OK" : "ERROR");
 
