@@ -11,6 +11,7 @@
 #include "GestorWiFi.h"
 #include "DatosAula.h"
 #include "Diagnostico.h"
+#include "GestorNTP.h"
 
 class Sistema
 {
@@ -27,6 +28,10 @@ private:
     Zumbador zumbador;
     GestorWiFi wifi;
     DatosSensores datos;
+
+    Diagnostico diagnostico;
+
+    GestorNTP ntp;
 
     uint32_t ultimoParpadeo = 0;
     uint32_t ultimaLecturaBME280 = 0;
@@ -47,6 +52,8 @@ private:
     void imprimirLecturas();
     void calibrarRuido();
     void actualizarEstadoAula();
+
+    void actualizarNTP();
+
     
-    Diagnostico diagnostico;
 };

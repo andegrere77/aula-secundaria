@@ -14,6 +14,9 @@ void Sistema::iniciar()
     wifi.iniciar();
     logger.info("Gestor WiFi iniciado");
 
+    ntp.iniciar();
+    logger.info("Gestor NTP iniciado");
+
     logger.info("Sistema iniciado correctamente");
 
     bme280OK = sensorBME280.iniciar();
@@ -63,6 +66,7 @@ void Sistema::iniciar()
 void Sistema::actualizar()
 {
     actualizarWiFi();
+    actualizarNTP();
     actualizarLed();
     actualizarBME280();
     actualizarRuido();
@@ -212,6 +216,8 @@ void Sistema::imprimirLecturas()
         datos,
         wifi.conectado(),
         wifi.ip(),
+        ntp.sincronizado(),
+        ntp.horaActual(),
         bme280OK,
         ruidoOK,
         oledOK
@@ -270,4 +276,9 @@ void Sistema::actualizarWiFi()
             logger.error("WiFi desconectado");
         }
     }
+}
+
+void Sistema::actualizarNTP()
+{
+    ntp.actualizar(wifi.conectado());
 }

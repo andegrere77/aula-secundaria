@@ -4,12 +4,19 @@ void Diagnostico::mostrar(
     const DatosSensores& datos,
     bool wifiConectado,
     const char* ip,
+    bool ntpSincronizado,
+    const char* hora,
     bool bme280OK,
     bool ruidoOK,
     bool oledOK
 )
 {
     Serial.println("================================");
+
+    Serial.print("Hora        : ");
+    Serial.print(hora);
+    Serial.print(" | NTP: ");
+    Serial.println(ntpSincronizado ? "OK" : "NO SINCRONIZADO");
 
     Serial.print("Temperatura : ");
     Serial.print(datos.temperatura, 2);

@@ -38,4 +38,10 @@ namespace Config
     constexpr float MARGEN_RUIDO_DBA = 20.0f; 
 
     constexpr uint32_t INTERVALO_WIFI = 10000;
+
+    constexpr const char* NTP_SERVIDOR = "pool.ntp.org";
+    constexpr long NTP_GMT_OFFSET = 3600;
+    constexpr int NTP_OFFSET_VERANO = 3600;
+
+    constexpr uint32_t INTERVALO_NTP = 60000;
 }
