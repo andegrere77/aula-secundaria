@@ -8,6 +8,27 @@ enum class EstadoAula
     ALARMA
 };
 
+inline const char* textoEstadoAula(EstadoAula estado)
+{
+    switch (estado)
+    {
+        case EstadoAula::SILENCIO:
+            return "SILENCIO";
+
+        case EstadoAula::NORMAL:
+            return "NORMAL";
+
+        case EstadoAula::RUIDO:
+            return "RUIDO";
+
+        case EstadoAula::ALARMA:
+            return "ALARMA";
+
+        default:
+            return "DESCONOCIDO";
+    }
+}
+
 struct DatosSensores
 {
     float temperatura = 0.0f;

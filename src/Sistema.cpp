@@ -152,12 +152,16 @@ void Sistema::actualizarRuido()
     sensorRuido.actualizar();
 
     datos.ruido = sensorRuido.ruidoDBA();
+    actualizarEstadoAula();
     semaforo.actualizar(datos.ruido, datos.ruidoBase, datos.umbralRuido);
     zumbador.actualizar(datos.ruido, datos.umbralRuido);
 
     Serial.print("Ruido      : ");
     Serial.print(datos.ruido, 1);
     Serial.println(" dBA");
+
+    Serial.print("Estado aula: ");
+    Serial.println(textoEstadoAula(datos.estado));
 }
 
 void Sistema::calibrarRuido()
@@ -218,4 +222,34 @@ void Sistema::imprimirLecturas()
     Serial.print("Presion     : ");
     Serial.print(datos.presion);
     Serial.println(" hPa");
+}
+
+void Sistema::actualizarEstadoAula()
+{
+    if (datos.umbralRuido <= datos.ruidoBase)
+    {
+        datos.estado = EstadoAula::SILENCIO;
+        return;
+    }
+
+    float proporcion =
+        (datos.ruido - datos.ruidoBase) /
+        (datos.umbralRuido - datos.ruidoBase);
+
+    if (proporcion < 0.25f)
+    {
+        datos.estado = EstadoAula::SILENCIO;
+    }
+    else if (proporcion < 0.60f)
+    {
+        datos.estado = EstadoAula::NORMAL;
+    }
+    else if (proporcion < 1.0f)
+    {
+        datos.estado = EstadoAula::RUIDO;
+    }
+    else
+    {
+        datos.estado = EstadoAula::ALARMA;
+    }
 }

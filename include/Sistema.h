@@ -40,4 +40,6 @@ private:
     void actualizarRuido();
     void imprimirLecturas();
     void calibrarRuido();
+    void actualizarEstadoAula();
+    
 };
