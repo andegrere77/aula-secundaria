@@ -224,6 +224,7 @@ void Sistema::imprimirLecturas()
         wifi.conectado(),
         wifi.ip(),
         ntp.sincronizado(),
+        ntp.fechaActual(),
         ntp.horaActual(),
         firebase.conectado(),
         firebase.uid(),
@@ -316,6 +317,7 @@ void Sistema::enviarFirebase()
 
     bool enviado = firebase.enviarActual(
         datos,
+        ntp.fechaActual(),
         ntp.horaActual(),
         ntp.timestamp()
     );
@@ -323,10 +325,26 @@ void Sistema::enviarFirebase()
     if (enviado)
     {
         logger.info("Datos actuales enviados a Firebase");
+
+        bool historico = firebase.enviarHistorico(
+            datos,
+            ntp.fechaActual(),
+            ntp.horaActual(),
+            ntp.timestamp()
+        );
+
+        if (historico)
+        {
+            logger.info("Historico enviado correctamente");
+        }
+        else
+        {
+            logger.error(firebase.ultimoError());
+        }
     }
     else
     {
-        logger.error("Error enviando datos actuales a Firebase");
+        logger.error(firebase.ultimoError());
     }
 }
 

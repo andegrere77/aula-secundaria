@@ -11,6 +11,7 @@ public:
     bool wifiConectado,
     const char* ip,
     bool ntpSincronizado,
+    const char* fecha,
     const char* hora,
     bool firebaseConectado,
     const char* uidFirebase,

@@ -9,6 +9,8 @@
 
 #include "DatosAula.h"
 
+#include "RutasFirebase.h"
+
 class GestorFirebase
 {
 public:
@@ -21,11 +23,19 @@ public:
     const char* uid() const;
     const char* ultimoError() const;
 
-    bool enviarActual(
+   bool enviarActual(
+    const DatosSensores& datos,
+    const char* fecha,
+    const char* hora,
+    unsigned long timestamp
+);
+
+    bool enviarHistorico(
         const DatosSensores& datos,
+        const char* fecha,
         const char* hora,
         unsigned long timestamp
-    );
+);
 
 private:
     WiFiClientSecure clienteSSL;
@@ -36,9 +46,20 @@ private:
 
     bool firebaseConectado = false;
 
+    bool construirJsonDatos(
+        object_t& json,
+        const DatosSensores& datos,
+        const char* fecha,
+        const char* hora,
+        unsigned long timestamp
+);
+
+
     char uidUsuario[64] = "";
     char mensajeError[160] = "";
 
     void actualizarUID();
     void guardarUltimoError();
+
+
 };

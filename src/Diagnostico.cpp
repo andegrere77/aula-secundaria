@@ -5,6 +5,7 @@ void Diagnostico::mostrar(
     bool wifiConectado,
     const char* ip,
     bool ntpSincronizado,
+    const char* fecha,
     const char* hora,
     bool firebaseConectado,
     const char* uidFirebase,
@@ -14,6 +15,9 @@ void Diagnostico::mostrar(
 )
 {
     Serial.println("================================");
+
+    Serial.print("Fecha       : ");
+    Serial.println(fecha);
 
     Serial.print("Hora        : ");
     Serial.print(hora);

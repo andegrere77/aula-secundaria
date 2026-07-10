@@ -1,6 +1,5 @@
 #include "GestorFirebase.h"
 
-#include "configuracion.h"
 #include "secrets.h"
 
 GestorFirebase::GestorFirebase()
@@ -83,11 +82,69 @@ void GestorFirebase::actualizarUID()
     }
 }
 
-bool GestorFirebase::enviarActual(
+bool GestorFirebase::construirJsonDatos(
+    object_t& json,
     const DatosSensores& datos,
+    const char* fecha,
     const char* hora,
     unsigned long timestamp
 )
+{
+    object_t objTimestamp;
+    object_t objFecha;
+    object_t objHora;
+    object_t objTemperatura;
+    object_t objHumedad;
+    object_t objPresion;
+    object_t objRuido;
+    object_t objRuidoBase;
+    object_t objUmbral;
+    object_t objEstado;
+
+    JsonWriter escritor;
+
+    escritor.create(objTimestamp, "timestamp", static_cast<uint32_t>(timestamp));
+    escritor.create(objFecha, "fecha", string_t(fecha));
+    escritor.create(objHora, "hora", string_t(hora));
+
+    escritor.create(objTemperatura, "temperatura", number_t(datos.temperatura, 2));
+    escritor.create(objHumedad, "humedad", number_t(datos.humedad, 2));
+    escritor.create(objPresion, "presion", number_t(datos.presion, 2));
+
+    escritor.create(objRuido, "ruido", number_t(datos.ruido, 1));
+    escritor.create(objRuidoBase, "ruidoBase", number_t(datos.ruidoBase, 1));
+    escritor.create(objUmbral, "umbralRuido", number_t(datos.umbralRuido, 1));
+
+    escritor.create(objEstado, "estado", static_cast<int>(datos.estado));
+
+    escritor.join(
+        json,
+        10,
+        objTimestamp,
+        objFecha,
+        objHora,
+        objTemperatura,
+        objHumedad,
+        objPresion,
+        objRuido,
+        objRuidoBase,
+        objUmbral,
+        objEstado
+    );
+
+    return true;
+}
+
+
+
+
+bool GestorFirebase::enviarActual(
+    const DatosSensores& datos,
+    const char* fecha,
+    const char* hora,
+    unsigned long timestamp
+)
+
 {
     if (!firebaseConectado)
     {
@@ -107,95 +164,39 @@ bool GestorFirebase::enviarActual(
      * Creamos un objeto por campo y luego los unimos.
      */
 
-    object_t objetoTimestamp;
-    object_t objetoHora;
-    object_t objetoTemperatura;
-    object_t objetoHumedad;
-    object_t objetoPresion;
-    object_t objetoRuido;
-    object_t objetoRuidoBase;
-    object_t objetoUmbral;
-    object_t objetoEstado;
+object_t json;
 
-    object_t json;
-
-    JsonWriter escritor;
-
-    escritor.create(
-        objetoTimestamp,
-        "timestamp",
-        static_cast<uint32_t>(timestamp)
-    );
-
-    escritor.create(
-        objetoHora,
-        "hora",
-        string_t(hora)
-    );
-
-    escritor.create(
-        objetoTemperatura,
-        "temperatura",
-        number_t(datos.temperatura, 2)
-    );
-
-    escritor.create(
-        objetoHumedad,
-        "humedad",
-        number_t(datos.humedad, 2)
-    );
-
-    escritor.create(
-        objetoPresion,
-        "presion",
-        number_t(datos.presion, 2)
-    );
-
-    escritor.create(
-        objetoRuido,
-        "ruido",
-        number_t(datos.ruido, 1)
-    );
-
-    escritor.create(
-        objetoRuidoBase,
-        "ruidoBase",
-        number_t(datos.ruidoBase, 1)
-    );
-
-    escritor.create(
-        objetoUmbral,
-        "umbralRuido",
-        number_t(datos.umbralRuido, 1)
-    );
-
-    escritor.create(
-        objetoEstado,
-        "estado",
-        static_cast<int>(datos.estado)
-    );
-
-    escritor.join(
+if (!construirJsonDatos(
         json,
-        9,
-        objetoTimestamp,
-        objetoHora,
-        objetoTemperatura,
-        objetoHumedad,
-        objetoPresion,
-        objetoRuido,
-        objetoRuidoBase,
-        objetoUmbral,
-        objetoEstado
+        datos,
+        fecha,
+        hora,
+        timestamp))
+{
+    snprintf(
+        mensajeError,
+        sizeof(mensajeError),
+        "No se pudo construir el JSON"
     );
 
-    String ruta = "/aulas/";
-    ruta += Config::ID_AULA;
-    ruta += "/actual";
+    return false;
+}
+    char ruta[96];
+
+    if (!RutasFirebase::actual(ruta, sizeof(ruta)))
+    {
+        snprintf(
+            mensajeError,
+            sizeof(mensajeError),
+            "No se pudo construir la ruta de datos actuales"
+        );
+
+        return false;
+    }
 
     bool resultado = baseDatos.set<object_t>(
         clienteAsync,
-        ruta.c_str(),
+        ruta,
         json
     );
 
@@ -226,4 +227,78 @@ void GestorFirebase::guardarUltimoError()
         codigo,
         mensaje.c_str()
     );
+}
+
+bool GestorFirebase::enviarHistorico(
+    const DatosSensores& datos,
+    const char* fecha,
+    const char* hora,
+    unsigned long timestamp
+)
+{
+    if (!firebaseConectado)
+    {
+        snprintf(
+            mensajeError,
+            sizeof(mensajeError),
+            "Firebase no conectado"
+        );
+
+        return false;
+    }
+
+    object_t json;
+
+    if (!construirJsonDatos(
+            json,
+            datos,
+            fecha,
+            hora,
+            timestamp))
+    {
+        snprintf(
+            mensajeError,
+            sizeof(mensajeError),
+            "No se pudo construir el JSON"
+        );
+
+        return false;
+    }
+
+    char ruta[128];
+
+    if (!RutasFirebase::historico(
+            ruta,
+            sizeof(ruta),
+            fecha,
+            timestamp))
+    {
+        snprintf(
+            mensajeError,
+            sizeof(mensajeError),
+            "No se pudo construir la ruta del historico"
+        );
+
+        return false;
+    }
+
+    bool resultado = baseDatos.set<object_t>(
+        clienteAsync,
+        ruta,
+        json
+    );
+
+    if (!resultado || clienteAsync.lastError().code() != 0)
+    {
+        guardarUltimoError();
+        return false;
+    }
+
+    snprintf(
+        mensajeError,
+        sizeof(mensajeError),
+        "OK"
+    );
+
+    return true;
 }

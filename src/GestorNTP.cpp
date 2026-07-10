@@ -74,4 +74,18 @@ void GestorNTP::actualizarHora()
         tiempo.tm_min,
         tiempo.tm_sec
     );
+
+    snprintf(
+        bufferFecha,
+        sizeof(bufferFecha),
+        "%04d-%02d-%02d",
+        tiempo.tm_year + 1900,
+        tiempo.tm_mon + 1,
+        tiempo.tm_mday
+);
+}
+
+const char* GestorNTP::fechaActual() const
+{
+    return bufferFecha;
 }
