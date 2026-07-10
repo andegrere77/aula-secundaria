@@ -1,7 +1,7 @@
 #include "GestorFirebase.h"
 
-#include "secrets.h"
 #include "configuracion.h"
+#include "secrets.h"
 
 GestorFirebase::GestorFirebase()
     : clienteAsync(clienteSSL),
@@ -17,10 +17,20 @@ void GestorFirebase::iniciar()
 {
     clienteSSL.setInsecure();
 
-    initializeApp(clienteAsync, app, getAuth(usuarioAuth));
+    initializeApp(
+        clienteAsync,
+        app,
+        getAuth(usuarioAuth)
+    );
 
     app.getApp(baseDatos);
     baseDatos.url(Secrets::FIREBASE_DATABASE_URL);
+
+    snprintf(
+        mensajeError,
+        sizeof(mensajeError),
+        "Firebase inicializado"
+    );
 }
 
 void GestorFirebase::actualizar(bool wifiConectado)
@@ -31,7 +41,9 @@ void GestorFirebase::actualizar(bool wifiConectado)
         return;
     }
 
+    // Estos dos métodos deben ejecutarse continuamente.
     app.loop();
+    baseDatos.loop();
 
     firebaseConectado = app.ready();
 
@@ -51,13 +63,23 @@ const char* GestorFirebase::uid() const
     return uidUsuario;
 }
 
+const char* GestorFirebase::ultimoError() const
+{
+    return mensajeError;
+}
+
 void GestorFirebase::actualizarUID()
 {
-    String uid = app.getUid();
+    String uidActual = app.getUid();
 
-    if (uid.length() > 0)
+    if (uidActual.length() > 0)
     {
-        snprintf(uidUsuario, sizeof(uidUsuario), "%s", uid.c_str());
+        snprintf(
+            uidUsuario,
+            sizeof(uidUsuario),
+            "%s",
+            uidActual.c_str()
+        );
     }
 }
 
@@ -69,67 +91,139 @@ bool GestorFirebase::enviarActual(
 {
     if (!firebaseConectado)
     {
-        return false;
-    }
-
-
-
-
-
-object_t json;
-JsonWriter writer;
-
-writer.create(json, "timestamp", timestamp);
-writer.create(json, "hora", hora);
-
-writer.create(json, "temperatura", datos.temperatura);
-writer.create(json, "humedad", datos.humedad);
-writer.create(json, "presion", datos.presion);
-
-writer.create(json, "ruido", datos.ruido);
-writer.create(json, "ruidoBase", datos.ruidoBase);
-writer.create(json, "umbralRuido", datos.umbralRuido);
-writer.create(json, "estado", static_cast<int>(datos.estado));
-
-String ruta = "/aulas/";
-ruta += Config::ID_AULA;
-ruta += "/actual";
-
-return baseDatos.set<object_t>(clienteAsync, ruta.c_str(), json);
-}
-
-bool GestorFirebase::enviarPrueba()
-{
-    if (!firebaseConectado)
-    {
-        snprintf(mensajeError, sizeof(mensajeError), "Firebase no conectado");
-        return false;
-    }
-
-    String ruta = "/aulas/";
-    ruta += Config::ID_AULA;
-    ruta += "/prueba";
-
-    bool ok = baseDatos.set<bool>(clienteAsync, ruta.c_str(), true);
-
-    if (!ok || clienteAsync.lastError().code() != 0)
-    {
         snprintf(
             mensajeError,
             sizeof(mensajeError),
-            "Error %d: %s",
-            clienteAsync.lastError().code(),
-            clienteAsync.lastError().message().c_str()
+            "Firebase no conectado"
         );
 
         return false;
     }
 
-    snprintf(mensajeError, sizeof(mensajeError), "OK");
+    /*
+     * JsonWriter no acumula correctamente los campos llamando
+     * repetidamente a create() sobre el mismo objeto.
+     *
+     * Creamos un objeto por campo y luego los unimos.
+     */
+
+    object_t objetoTimestamp;
+    object_t objetoHora;
+    object_t objetoTemperatura;
+    object_t objetoHumedad;
+    object_t objetoPresion;
+    object_t objetoRuido;
+    object_t objetoRuidoBase;
+    object_t objetoUmbral;
+    object_t objetoEstado;
+
+    object_t json;
+
+    JsonWriter escritor;
+
+    escritor.create(
+        objetoTimestamp,
+        "timestamp",
+        static_cast<uint32_t>(timestamp)
+    );
+
+    escritor.create(
+        objetoHora,
+        "hora",
+        string_t(hora)
+    );
+
+    escritor.create(
+        objetoTemperatura,
+        "temperatura",
+        number_t(datos.temperatura, 2)
+    );
+
+    escritor.create(
+        objetoHumedad,
+        "humedad",
+        number_t(datos.humedad, 2)
+    );
+
+    escritor.create(
+        objetoPresion,
+        "presion",
+        number_t(datos.presion, 2)
+    );
+
+    escritor.create(
+        objetoRuido,
+        "ruido",
+        number_t(datos.ruido, 1)
+    );
+
+    escritor.create(
+        objetoRuidoBase,
+        "ruidoBase",
+        number_t(datos.ruidoBase, 1)
+    );
+
+    escritor.create(
+        objetoUmbral,
+        "umbralRuido",
+        number_t(datos.umbralRuido, 1)
+    );
+
+    escritor.create(
+        objetoEstado,
+        "estado",
+        static_cast<int>(datos.estado)
+    );
+
+    escritor.join(
+        json,
+        9,
+        objetoTimestamp,
+        objetoHora,
+        objetoTemperatura,
+        objetoHumedad,
+        objetoPresion,
+        objetoRuido,
+        objetoRuidoBase,
+        objetoUmbral,
+        objetoEstado
+    );
+
+    String ruta = "/aulas/";
+    ruta += Config::ID_AULA;
+    ruta += "/actual";
+
+    bool resultado = baseDatos.set<object_t>(
+        clienteAsync,
+        ruta.c_str(),
+        json
+    );
+
+    if (!resultado || clienteAsync.lastError().code() != 0)
+    {
+        guardarUltimoError();
+        return false;
+    }
+
+    snprintf(
+        mensajeError,
+        sizeof(mensajeError),
+        "OK"
+    );
+
     return true;
 }
 
-const char* GestorFirebase::ultimoError() const
+void GestorFirebase::guardarUltimoError()
 {
-    return mensajeError;
+    int codigo = clienteAsync.lastError().code();
+    String mensaje = clienteAsync.lastError().message();
+
+    snprintf(
+        mensajeError,
+        sizeof(mensajeError),
+        "Error %d: %s",
+        codigo,
+        mensaje.c_str()
+    );
 }

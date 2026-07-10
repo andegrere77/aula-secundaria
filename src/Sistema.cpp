@@ -71,11 +71,12 @@ void Sistema::actualizar()
     actualizarWiFi();
     actualizarNTP();
     actualizarFirebase();
-    probarFirebase();
-    enviarFirebase();
+   
     actualizarLed();
     actualizarBME280();
     actualizarRuido();
+
+     enviarFirebase();
 }
 
 void Sistema::mostrarBanner()
@@ -329,27 +330,3 @@ void Sistema::enviarFirebase()
     }
 }
 
-void Sistema::probarFirebase()
-{
-    if (pruebaFirebaseEnviada)
-    {
-        return;
-    }
-
-    if (!firebase.conectado())
-    {
-        return;
-    }
-
-    bool ok = firebase.enviarPrueba();
-
-    if (ok)
-    {
-        logger.info("Prueba Firebase enviada correctamente");
-        pruebaFirebaseEnviada = true;
-    }
-    else
-    {
-        logger.error(firebase.ultimoError());
-    }
-}

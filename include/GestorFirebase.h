@@ -19,11 +19,13 @@ public:
 
     bool conectado() const;
     const char* uid() const;
-
-    bool enviarActual(const DatosSensores& datos, const char* hora, unsigned long timestamp);
-
-    bool enviarPrueba();
     const char* ultimoError() const;
+
+    bool enviarActual(
+        const DatosSensores& datos,
+        const char* hora,
+        unsigned long timestamp
+    );
 
 private:
     WiFiClientSecure clienteSSL;
@@ -33,9 +35,10 @@ private:
     RealtimeDatabase baseDatos;
 
     bool firebaseConectado = false;
-    char uidUsuario[64] = "";
 
-    char mensajeError[128] = "";
+    char uidUsuario[64] = "";
+    char mensajeError[160] = "";
 
     void actualizarUID();
+    void guardarUltimoError();
 };

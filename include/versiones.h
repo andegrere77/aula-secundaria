@@ -2,7 +2,12 @@
 
 namespace Version
 {
-    constexpr const char* NOMBRE_PROYECTO = "aula-secundaria";
-    constexpr const char* VERSION = "0.19.0";
-    constexpr const char* DESCRIPCION = "Envio de datos actuales a Firebase";
+    constexpr const char* NOMBRE_PROYECTO =
+        "aula-secundaria";
+
+    constexpr const char* VERSION =
+        "0.19.0";
+
+    constexpr const char* DESCRIPCION =
+        "Publicacion del estado actual en Firebase";
 }

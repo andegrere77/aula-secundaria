@@ -49,10 +49,10 @@ private:
     bool oledOK = false;
     bool wifiAnterior = false;
 
-    bool pruebaFirebaseEnviada = false;
+  
+    bool primerEnvioFirebasePendiente = true;
     
-    void probarFirebase();
-
+    
     void mostrarBanner();
     void actualizarLed();
     void actualizarBME280();
