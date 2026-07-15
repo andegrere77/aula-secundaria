@@ -2,6 +2,8 @@
 
 #include "secrets.h"
 
+#include "versiones.h"
+
 GestorFirebase::GestorFirebase()
     : clienteAsync(clienteSSL),
       usuarioAuth(
@@ -100,6 +102,7 @@ bool GestorFirebase::construirJsonDatos(
     object_t objRuidoBase;
     object_t objUmbral;
     object_t objEstado;
+    object_t objVersionFirmware;
 
     JsonWriter escritor;
 
@@ -117,9 +120,12 @@ bool GestorFirebase::construirJsonDatos(
 
     escritor.create(objEstado, "estado", static_cast<int>(datos.estado));
 
+    escritor.create(objVersionFirmware, "versionFirmware", string_t(Version::VERSION)
+);
+
     escritor.join(
         json,
-        10,
+        11,
         objTimestamp,
         objFecha,
         objHora,
@@ -129,7 +135,8 @@ bool GestorFirebase::construirJsonDatos(
         objRuido,
         objRuidoBase,
         objUmbral,
-        objEstado
+        objEstado,
+        objVersionFirmware
     );
 
     return true;

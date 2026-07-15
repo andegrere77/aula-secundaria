@@ -6,7 +6,7 @@ namespace Version
         "aula-secundaria";
 
     constexpr const char* VERSION =
-        "0.19.0";
+        "0.21.0";
 
     constexpr const char* DESCRIPCION =
         "Publicacion del estado actual en Firebase";
