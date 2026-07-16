@@ -20,6 +20,7 @@ void Sistema::iniciar()
     firebase.iniciar();
     logger.info("Gestor Firebase iniciado");
 
+
     logger.info("Sistema iniciado correctamente");
 
     bme280OK = sensorBME280.iniciar();
@@ -62,13 +63,19 @@ void Sistema::iniciar()
     zumbador.iniciar();
     logger.info("Zumbador activo inicializado correctamente");
 
+    
+    
     calibrarRuido();
+
+    
 
 }
 
 void Sistema::actualizar()
 {
+    ota.actualizar();
     actualizarWiFi();
+    actualizarOTA();
     actualizarNTP();
     actualizarFirebase();
    
@@ -348,3 +355,20 @@ void Sistema::enviarFirebase()
     }
 }
 
+void Sistema::actualizarOTA()
+{
+    if (!otaIniciada)
+    {
+        if (!wifi.conectado())
+        {
+            return;
+        }
+
+        ota.iniciar();
+        otaIniciada = true;
+
+        logger.info("Servicio OTA iniciado");
+    }
+
+    ota.actualizar();
+}

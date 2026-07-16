@@ -13,6 +13,7 @@
 #include "Diagnostico.h"
 #include "GestorNTP.h"
 #include "GestorFirebase.h"
+#include "GestorOTA.h"
 
 class Sistema
 {
@@ -36,6 +37,8 @@ private:
 
     GestorFirebase firebase;
 
+    GestorOTA ota;
+
     uint32_t ultimoParpadeo = 0;
     uint32_t ultimaLecturaBME280 = 0;
     uint32_t ultimaLecturaRuido = 0;
@@ -51,6 +54,8 @@ private:
 
   
     bool primerEnvioFirebasePendiente = true;
+
+    bool otaIniciada = false;
     
     
     void mostrarBanner();
@@ -67,6 +72,8 @@ private:
     void actualizarFirebase();
 
     void enviarFirebase();
+
+    void actualizarOTA();
 
     
 };
