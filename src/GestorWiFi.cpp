@@ -15,6 +15,7 @@ void GestorWiFi::actualizar()
 {
     if (WiFi.status() == WL_CONNECTED)
     {
+        WiFi.setSleep(false);
         wifiConectado = true;
         snprintf(ipActual, sizeof(ipActual), "%s", WiFi.localIP().toString().c_str());
         return;
@@ -45,4 +46,5 @@ void GestorWiFi::conectar()
 {
     WiFi.disconnect();
     WiFi.begin(Secrets::WIFI_SSID, Secrets::WIFI_PASSWORD);
+    
 }

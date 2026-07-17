@@ -70,3 +70,66 @@ bool RutasFirebase::historico(
     return caracteresEscritos >= 0 &&
            static_cast<size_t>(caracteresEscritos) < tamanoDestino;
 }
+
+bool RutasFirebase::versionOTA(
+    char* destino,
+    size_t tamanoDestino
+)
+{
+    if (destino == nullptr || tamanoDestino == 0)
+    {
+        return false;
+    }
+
+    int caracteresEscritos = snprintf(
+        destino,
+        tamanoDestino,
+        "/aulas/%s/ota/version",
+        Config::ID_AULA
+    );
+
+    return caracteresEscritos >= 0 &&
+           static_cast<size_t>(caracteresEscritos) < tamanoDestino;
+}
+
+bool RutasFirebase::firmwareOTA(
+    char* destino,
+    size_t tamanoDestino
+)
+{
+    if (destino == nullptr || tamanoDestino == 0)
+    {
+        return false;
+    }
+
+    int caracteresEscritos = snprintf(
+        destino,
+        tamanoDestino,
+        "/aulas/%s/ota/firmware",
+        Config::ID_AULA
+    );
+
+    return caracteresEscritos >= 0 &&
+           static_cast<size_t>(caracteresEscritos) < tamanoDestino;
+}
+
+bool RutasFirebase::fechaOTA(
+    char* destino,
+    size_t tamanoDestino
+)
+{
+    if (destino == nullptr || tamanoDestino == 0)
+    {
+        return false;
+    }
+
+    int caracteresEscritos = snprintf(
+        destino,
+        tamanoDestino,
+        "/aulas/%s/ota/fecha",
+        Config::ID_AULA
+    );
+
+    return caracteresEscritos >= 0 &&
+           static_cast<size_t>(caracteresEscritos) < tamanoDestino;
+}

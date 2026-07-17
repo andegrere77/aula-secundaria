@@ -37,6 +37,18 @@ public:
         unsigned long timestamp
 );
 
+    bool consultarInformacionOTA();
+
+    const char* versionOTADisponible() const;
+    const char* rutaFirmwareOTA() const;
+    const char* fechaOTA() const;
+
+    bool crearConfiguracionOTATemporal();
+
+    bool hayActualizacionDisponible(
+    const char* versionInstalada
+    ) const;
+
 private:
     WiFiClientSecure clienteSSL;
     AsyncClientClass clienteAsync;
@@ -60,6 +72,17 @@ private:
 
     void actualizarUID();
     void guardarUltimoError();
+
+    char versionRemota[24] = "";
+    char firmwareRemoto[160] = "";
+    char fechaRemota[16] = "";
+
+    static bool descomponerVersion(
+    const char* version,
+    int& mayor,
+    int& menor,
+    int& parche
+);
 
 
 };

@@ -75,5 +75,16 @@ private:
 
     void actualizarOTA();
 
+    uint32_t ultimaComprobacionOTA = 0;
+    bool primeraComprobacionOTAPendiente = true;
+
+    void comprobarActualizacionRemota();
+    bool configuracionOTACreada = false;
+
+
+    bool actualizacionHTTPSIntentada = false;
+
+    void comprobarEInstalarActualizacionHTTPS();
+
     
 };

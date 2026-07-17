@@ -17,4 +17,21 @@ public:
         const char* fecha,
         unsigned long timestamp
     );
+    
+    static bool versionOTA(
+      char* destino,
+      size_t tamanoDestino
+    );
+
+    static bool firmwareOTA(
+      char* destino,
+      size_t tamanoDestino
+    );
+
+    static bool fechaOTA(
+      char* destino,
+      size_t tamanoDestino
+    );
+    
+  
 };

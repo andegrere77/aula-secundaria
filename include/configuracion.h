@@ -48,4 +48,16 @@ namespace Config
     constexpr const char* ID_AULA = "AULA-001";
     constexpr uint32_t INTERVALO_FIREBASE = 10000;
 
+    constexpr uint32_t INTERVALO_COMPROBACION_OTA = 300000;
+
+    constexpr bool CREAR_CONFIGURACION_OTA = false;
+
+    constexpr const char* URL_VERSION_OTA =
+    "https://aula-secundaria.web.app/firmware/version.txt";
+
+    constexpr const char* URL_FIRMWARE_OTA =
+    "https://aula-secundaria.web.app/firmware/firmware.bin";
+
+    constexpr bool ACTIVAR_ACTUALIZACION_HTTPS = true;
+
 }

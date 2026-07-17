@@ -7,12 +7,15 @@ void Sistema::iniciar()
 {
     logger.iniciar(Config::VELOCIDAD_SERIE);
 
+     wifi.iniciar();
+    logger.info("Gestor WiFi iniciado");
+
+    
     pinMode(Config::PIN_LED_INTEGRADO, OUTPUT);
 
     mostrarBanner();
 
-    wifi.iniciar();
-    logger.info("Gestor WiFi iniciado");
+   
 
     ntp.iniciar();
     logger.info("Gestor NTP iniciado");
@@ -74,16 +77,50 @@ void Sistema::iniciar()
 void Sistema::actualizar()
 {
     ota.actualizar();
+    
+
+    if (ota.actualizando())
+
+    {
+
+        return;
+
+    }
     actualizarWiFi();
     actualizarOTA();
+
+    comprobarEInstalarActualizacionHTTPS();
+    
     actualizarNTP();
     actualizarFirebase();
+
+
+   if (Config::CREAR_CONFIGURACION_OTA &&
+    !configuracionOTACreada &&
+    firebase.conectado())
+{
+    if (firebase.crearConfiguracionOTATemporal())
+    {
+        logger.info("Configuracion OTA creada en Firebase");
+        configuracionOTACreada = true;
+    }
+    else
+    {
+        logger.error(firebase.ultimoError());
+    }
+}
+
+
+    comprobarActualizacionRemota();
    
     actualizarLed();
     actualizarBME280();
     actualizarRuido();
 
      enviarFirebase();
+
+     
+     
 }
 
 void Sistema::mostrarBanner()
@@ -370,5 +407,152 @@ void Sistema::actualizarOTA()
         logger.info("Servicio OTA iniciado");
     }
 
-    ota.actualizar();
+  
+}
+
+void Sistema::comprobarActualizacionRemota()
+{
+    if (!firebase.conectado())
+    {
+        return;
+    }
+
+    uint32_t ahora = millis();
+
+    bool intervaloCumplido =
+        ahora - ultimaComprobacionOTA >=
+        Config::INTERVALO_COMPROBACION_OTA;
+
+    if (!primeraComprobacionOTAPendiente &&
+        !intervaloCumplido)
+    {
+        return;
+    }
+
+    bool consultaCorrecta =
+        firebase.consultarInformacionOTA();
+
+    if (!consultaCorrecta)
+    {
+        logger.error(firebase.ultimoError());
+        return;
+    }
+
+    ultimaComprobacionOTA = ahora;
+    primeraComprobacionOTAPendiente = false;
+
+    Serial.println("--------------------------------");
+    Serial.println("INFORMACION OTA");
+
+    Serial.print("Firmware instalado : ");
+    Serial.println(Version::VERSION);
+
+    Serial.print("Version disponible  : ");
+    Serial.println(
+        firebase.versionOTADisponible()
+    );
+
+    Serial.print("Archivo firmware    : ");
+    Serial.println(
+        firebase.rutaFirmwareOTA()
+    );
+
+    Serial.print("Fecha publicacion   : ");
+    Serial.println(
+        firebase.fechaOTA()
+    );
+    
+    bool actualizacionDisponible =
+    firebase.hayActualizacionDisponible(
+        Version::VERSION
+    );
+
+Serial.print("Estado OTA          : ");
+
+if (actualizacionDisponible)
+{
+    Serial.println("ACTUALIZACION DISPONIBLE");
+}
+else
+{
+    Serial.println("FIRMWARE ACTUALIZADO");
+}
+}
+
+
+
+void Sistema::comprobarEInstalarActualizacionHTTPS()
+{
+    if (!Config::ACTIVAR_ACTUALIZACION_HTTPS)
+    {
+        return;
+    }
+
+    if (actualizacionHTTPSIntentada)
+    {
+        return;
+    }
+
+    if (!wifi.conectado())
+    {
+        return;
+    }
+
+    char versionHosting[24];
+
+    bool consultaCorrecta =
+        ota.consultarVersionHTTPS(
+            Config::URL_VERSION_OTA,
+            versionHosting,
+            sizeof(versionHosting)
+        );
+
+    if (!consultaCorrecta)
+    {
+        logger.error(
+            "No se pudo consultar la version de Hosting"
+        );
+
+        actualizacionHTTPSIntentada = true;
+        return;
+    }
+
+    Serial.println("--------------------------------");
+    Serial.println("COMPROBACION OTA HTTPS");
+
+    Serial.print("Firmware instalado : ");
+    Serial.println(Version::VERSION);
+
+    Serial.print("Firmware disponible: ");
+    Serial.println(versionHosting);
+
+    bool versionSuperior =
+    ota.esVersionSuperior(
+        versionHosting,
+        Version::VERSION
+    );
+
+if (!versionSuperior)
+{
+    Serial.println(
+        "Estado              : FIRMWARE ACTUALIZADO"
+    );
+
+    Serial.println("--------------------------------");
+
+    actualizacionHTTPSIntentada = true;
+    return;
+}
+
+    Serial.println(
+        "Estado              : INICIANDO ACTUALIZACION"
+    );
+
+    Serial.println("--------------------------------");
+
+    actualizacionHTTPSIntentada = true;
+
+    ota.actualizarDesdeHTTPS(
+        Config::URL_FIRMWARE_OTA
+    );
 }

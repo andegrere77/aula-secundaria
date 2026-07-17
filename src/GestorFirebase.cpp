@@ -4,6 +4,10 @@
 
 #include "versiones.h"
 
+#include "RutasFirebase.h"
+
+#include "configuracion.h"
+
 GestorFirebase::GestorFirebase()
     : clienteAsync(clienteSSL),
       usuarioAuth(
@@ -308,4 +312,278 @@ bool GestorFirebase::enviarHistorico(
     );
 
     return true;
+}
+
+
+bool GestorFirebase::consultarInformacionOTA()
+{
+    if (!firebaseConectado)
+    {
+        snprintf(
+            mensajeError,
+            sizeof(mensajeError),
+            "Firebase no conectado"
+        );
+
+        return false;
+    }
+
+    char rutaVersion[96];
+    char rutaFirmware[96];
+    char rutaFecha[96];
+
+    if (!RutasFirebase::versionOTA(
+            rutaVersion,
+            sizeof(rutaVersion)) ||
+        !RutasFirebase::firmwareOTA(
+            rutaFirmware,
+            sizeof(rutaFirmware)) ||
+        !RutasFirebase::fechaOTA(
+            rutaFecha,
+            sizeof(rutaFecha)))
+    {
+        snprintf(
+            mensajeError,
+            sizeof(mensajeError),
+            "No se pudieron construir las rutas OTA"
+        );
+
+        return false;
+    }
+
+    String version = baseDatos.get<String>(
+        clienteAsync,
+        rutaVersion
+    );
+
+    if (clienteAsync.lastError().code() != 0)
+    {
+        guardarUltimoError();
+        return false;
+    }
+
+    String firmware = baseDatos.get<String>(
+        clienteAsync,
+        rutaFirmware
+    );
+
+    if (clienteAsync.lastError().code() != 0)
+    {
+        guardarUltimoError();
+        return false;
+    }
+
+    String fecha = baseDatos.get<String>(
+        clienteAsync,
+        rutaFecha
+    );
+
+    if (clienteAsync.lastError().code() != 0)
+    {
+        guardarUltimoError();
+        return false;
+    }
+
+    snprintf(
+        versionRemota,
+        sizeof(versionRemota),
+        "%s",
+        version.c_str()
+    );
+
+    snprintf(
+        firmwareRemoto,
+        sizeof(firmwareRemoto),
+        "%s",
+        firmware.c_str()
+    );
+
+    snprintf(
+        fechaRemota,
+        sizeof(fechaRemota),
+        "%s",
+        fecha.c_str()
+    );
+
+    snprintf(
+        mensajeError,
+        sizeof(mensajeError),
+        "OK"
+    );
+
+    return true;
+}
+
+const char* GestorFirebase::versionOTADisponible() const
+{
+    return versionRemota;
+}
+
+const char* GestorFirebase::rutaFirmwareOTA() const
+{
+    return firmwareRemoto;
+}
+
+const char* GestorFirebase::fechaOTA() const
+{
+    return fechaRemota;
+}
+
+
+bool GestorFirebase::crearConfiguracionOTATemporal()
+{
+    if (!firebaseConectado)
+    {
+        snprintf(
+            mensajeError,
+            sizeof(mensajeError),
+            "Firebase no conectado"
+        );
+
+        return false;
+    }
+
+    char rutaVersion[96];
+    char rutaFirmware[96];
+    char rutaFecha[96];
+
+    if (!RutasFirebase::versionOTA(
+            rutaVersion,
+            sizeof(rutaVersion)) ||
+        !RutasFirebase::firmwareOTA(
+            rutaFirmware,
+            sizeof(rutaFirmware)) ||
+        !RutasFirebase::fechaOTA(
+            rutaFecha,
+            sizeof(rutaFecha)))
+    {
+        snprintf(
+            mensajeError,
+            sizeof(mensajeError),
+            "No se pudieron construir las rutas OTA"
+        );
+
+        return false;
+    }
+
+    bool versionCorrecta = baseDatos.set<String>(
+        clienteAsync,
+        rutaVersion,
+        "0.23.0"
+    );
+
+    if (!versionCorrecta ||
+        clienteAsync.lastError().code() != 0)
+    {
+        guardarUltimoError();
+        return false;
+    }
+
+    bool firmwareCorrecto = baseDatos.set<String>(
+        clienteAsync,
+        rutaFirmware,
+        "firmware/firmware.bin"
+    );
+
+    if (!firmwareCorrecto ||
+        clienteAsync.lastError().code() != 0)
+    {
+        guardarUltimoError();
+        return false;
+    }
+
+    bool fechaCorrecta = baseDatos.set<String>(
+        clienteAsync,
+        rutaFecha,
+        "2026-07-16"
+    );
+
+    if (!fechaCorrecta ||
+        clienteAsync.lastError().code() != 0)
+    {
+        guardarUltimoError();
+        return false;
+    }
+
+    snprintf(
+        mensajeError,
+        sizeof(mensajeError),
+        "OK"
+    );
+
+    return true;
+}
+
+bool GestorFirebase::descomponerVersion(
+    const char* version,
+    int& mayor,
+    int& menor,
+    int& parche
+)
+{
+    if (version == nullptr || version[0] == '\0')
+    {
+        return false;
+    }
+
+    mayor = 0;
+    menor = 0;
+    parche = 0;
+
+    int elementosLeidos = sscanf(
+        version,
+        "%d.%d.%d",
+        &mayor,
+        &menor,
+        &parche
+    );
+
+    return elementosLeidos == 3;
+}
+
+bool GestorFirebase::hayActualizacionDisponible(
+    const char* versionInstalada
+) const
+{
+    if (versionInstalada == nullptr ||
+        versionInstalada[0] == '\0' ||
+        versionRemota[0] == '\0' ||
+        strcmp(versionRemota, "null") == 0)
+    {
+        return false;
+    }
+
+    int mayorInstalada;
+    int menorInstalada;
+    int parcheInstalada;
+
+    int mayorRemota;
+    int menorRemota;
+    int parcheRemota;
+
+    if (!descomponerVersion(
+            versionInstalada,
+            mayorInstalada,
+            menorInstalada,
+            parcheInstalada) ||
+        !descomponerVersion(
+            versionRemota,
+            mayorRemota,
+            menorRemota,
+            parcheRemota))
+    {
+        return false;
+    }
+
+    if (mayorRemota != mayorInstalada)
+    {
+        return mayorRemota > mayorInstalada;
+    }
+
+    if (menorRemota != menorInstalada)
+    {
+        return menorRemota > menorInstalada;
+    }
+
+    return parcheRemota > parcheInstalada;
 }
