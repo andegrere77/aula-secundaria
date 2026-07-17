@@ -56,6 +56,8 @@ private:
     bool primerEnvioFirebasePendiente = true;
 
     bool otaIniciada = false;
+
+    bool ntpIniciado = false;
     
     
     void mostrarBanner();

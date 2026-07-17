@@ -17,8 +17,8 @@ void Sistema::iniciar()
 
    
 
-    ntp.iniciar();
-    logger.info("Gestor NTP iniciado");
+    //ntp.iniciar();
+    //logger.info("Gestor NTP iniciado");
 
     firebase.iniciar();
     logger.info("Gestor Firebase iniciado");
@@ -88,10 +88,11 @@ void Sistema::actualizar()
     }
     actualizarWiFi();
     actualizarOTA();
-
+    actualizarNTP();
+    
     comprobarEInstalarActualizacionHTTPS();
     
-    actualizarNTP();
+    
     actualizarFirebase();
 
 
@@ -332,8 +333,22 @@ void Sistema::actualizarWiFi()
     }
 }
 
+
 void Sistema::actualizarNTP()
 {
+    if (!wifi.conectado())
+    {
+        return;
+    }
+
+    if (!ntpIniciado)
+    {
+        ntp.iniciar();
+        ntpIniciado = true;
+
+        logger.info("Gestor NTP iniciado");
+    }
+
     ntp.actualizar(wifi.conectado());
 }
 
